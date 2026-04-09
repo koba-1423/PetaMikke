@@ -1,0 +1,19 @@
+# Next.js
+.next/
+out/
+
+# 依存パッケージ
+node_modules/
+
+# 環境変数
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# デバッグログ
+npm-debug.log*
+
+# OS
+.DS_Store
