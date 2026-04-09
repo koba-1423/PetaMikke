@@ -1,4 +1,5 @@
 import { SealPlaceholder } from "@/components/Icons";
+import ReportButton from "@/components/ReportButton";
 
 type SealCardProps = {
   name: string;
@@ -38,9 +39,7 @@ export default function SealCard({ name, series, rate, price, seller, type }: Se
           ) : (
             <p className="text-purple-500 font-bold text-sm">交換のみ</p>
           )}
-          {seller && (
-            <p className="text-xs text-gray-300">@{seller}</p>
-          )}
+          <ReportButton targetType="出品" />
         </div>
       </div>
     </div>

@@ -24,6 +24,15 @@ export default function SellPage() {
         <h1 className="text-2xl font-bold text-gray-800 mb-1">シールを出品する</h1>
         <p className="text-gray-400 text-sm mb-6">シールの情報を入力して出品しよう</p>
 
+        {/* 偽物禁止警告 */}
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
+          <p className="text-sm font-bold text-red-600 mb-1">偽物・コピー品の出品は禁止です</p>
+          <p className="text-xs text-red-500 leading-relaxed">
+            模倣品・コピー品の出品は商標法・著作権法に違反する場合があります。発見次第、出品削除・アカウント停止の措置を取ります。
+            出品するシールが正規品であることを確認してください。
+          </p>
+        </div>
+
         <div className="space-y-5">
 
           {/* 写真アップロード */}
@@ -131,6 +140,18 @@ export default function SellPage() {
               placeholder="シールの状態や交換希望の詳細など..."
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-100 resize-none transition-colors"
             />
+          </div>
+
+          {/* 同意チェック */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" className="mt-0.5 accent-pink-500" />
+              <p className="text-xs text-gray-500 leading-relaxed">
+                出品するシールが正規品であることを確認しました。
+                <a href="/terms" className="text-pink-500 underline">利用規約</a>
+                および禁止事項に同意します。偽物・コピー品の出品は禁止されており、違反した場合はアカウントが停止されます。
+              </p>
+            </label>
           </div>
 
           {/* 出品ボタン */}

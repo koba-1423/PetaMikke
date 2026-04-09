@@ -1,4 +1,5 @@
 import { HeartIcon, CommentIcon, ShareIcon } from "@/components/Icons";
+import ReportButton from "@/components/ReportButton";
 
 type PostCardProps = {
   username: string;
@@ -63,6 +64,7 @@ export default function PostCard({
           <ShareIcon className="w-4 h-4" />
           <span>シェア</span>
         </button>
+        <ReportButton targetType="投稿" />
       </div>
     </div>
   );
