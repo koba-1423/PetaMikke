@@ -20,34 +20,34 @@ export default function MarketPage() {
     <div className="pb-16 md:pb-0">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">マーケット</h1>
-        <p className="text-gray-400 text-sm mb-5">シールを探して購入・交換しよう</p>
+      <div className="max-w-5xl mx-auto px-5 py-8">
+        <h1 className="text-xl font-semibold text-stone-900 mb-1">マーケット</h1>
+        <p className="text-stone-400 text-sm mb-6">シールを探して購入・交換しよう</p>
 
         {/* 検索バー */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-5">
           <div className="flex-1 relative">
-            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
             <input
               type="text"
               placeholder="シール名・シリーズで検索..."
-              className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-pink-400 bg-white"
+              className="w-full border border-stone-200 rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-stone-400 bg-white text-stone-700 placeholder-stone-300"
             />
           </div>
-          <button className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors">
+          <button className="bg-stone-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-stone-700 transition-colors">
             検索
           </button>
         </div>
 
-        {/* カテゴリフィルター */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
-          {categories.map((cat) => (
+        {/* カテゴリ */}
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1 mb-5">
+          {categories.map((cat, i) => (
             <button
               key={cat}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                cat === "すべて"
-                  ? "bg-pink-500 text-white border-pink-500"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-pink-300 hover:text-pink-500"
+              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                i === 0
+                  ? "bg-stone-900 text-white border-stone-900"
+                  : "bg-white text-stone-500 border-stone-200 hover:border-stone-400"
               }`}
             >
               {cat}
@@ -56,9 +56,9 @@ export default function MarketPage() {
         </div>
 
         {/* ソート */}
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-gray-400">{seals.length}件</p>
-          <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-pink-400 bg-white text-gray-700">
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-xs text-stone-400">{seals.length}件</p>
+          <select className="text-xs border border-stone-200 rounded-lg px-3 py-1.5 focus:outline-none bg-white text-stone-600">
             <option>新着順</option>
             <option>レート高い順</option>
             <option>価格が安い順</option>
@@ -66,8 +66,8 @@ export default function MarketPage() {
           </select>
         </div>
 
-        {/* 出品一覧 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {/* 一覧 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {seals.map((seal, i) => (
             <SealCard key={i} {...seal} />
           ))}

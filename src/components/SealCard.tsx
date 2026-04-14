@@ -12,22 +12,21 @@ type SealCardProps = {
 
 export default function SealCard({ name, series, rate, price, seller, type }: SealCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group">
-      {/* シール画像エリア */}
-      <div className="aspect-square overflow-hidden">
-        <SealPlaceholder series={series} className="w-full h-full group-hover:scale-105 transition-transform duration-300" />
+    <div className="bg-white border border-stone-100 rounded-xl overflow-hidden hover:border-stone-200 hover:shadow-sm transition-all cursor-pointer group">
+      <div className="aspect-square overflow-hidden bg-stone-50">
+        <SealPlaceholder series={series} className="w-full h-full group-hover:scale-105 transition-transform duration-500" />
       </div>
 
       <div className="p-3">
-        <p className="font-bold text-gray-800 text-sm leading-tight truncate">{name}</p>
-        <p className="text-xs text-gray-400 mt-0.5 truncate">{series}</p>
+        <p className="font-medium text-stone-900 text-sm leading-snug truncate">{name}</p>
+        <p className="text-xs text-stone-400 mt-0.5 truncate">{series}</p>
 
-        <div className="flex items-center gap-1.5 mt-2">
-          <span className="bg-pink-50 text-pink-600 text-xs font-bold px-2 py-0.5 rounded-md border border-pink-100">
+        <div className="flex items-center gap-1.5 mt-2.5">
+          <span className="text-xs text-stone-500 border border-stone-200 px-1.5 py-0.5 rounded">
             R{rate}
           </span>
           {type === "trade" && (
-            <span className="bg-purple-50 text-purple-600 text-xs font-medium px-2 py-0.5 rounded-md border border-purple-100">
+            <span className="text-xs text-stone-400 border border-stone-100 px-1.5 py-0.5 rounded bg-stone-50">
               交換
             </span>
           )}
@@ -35,9 +34,9 @@ export default function SealCard({ name, series, rate, price, seller, type }: Se
 
         <div className="flex items-center justify-between mt-2">
           {price !== undefined ? (
-            <p className="text-pink-500 font-bold text-sm">¥{price.toLocaleString()}</p>
+            <p className="text-stone-900 font-semibold text-sm">¥{price.toLocaleString()}</p>
           ) : (
-            <p className="text-purple-500 font-bold text-sm">交換のみ</p>
+            <p className="text-stone-400 text-sm">交換のみ</p>
           )}
           <ReportButton targetType="出品" />
         </div>

@@ -11,58 +11,45 @@ type PostCardProps = {
   tags?: string[];
 };
 
-export default function PostCard({
-  username,
-  avatarColor,
-  content,
-  likes,
-  comments,
-  timeAgo,
-  tags,
-}: PostCardProps) {
+export default function PostCard({ username, avatarColor, content, likes, comments, timeAgo, tags }: PostCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4">
-      {/* ユーザー情報 */}
-      <div className="flex items-center gap-3 mb-3">
+    <div className="bg-white border border-stone-100 rounded-xl p-4">
+      <div className="flex items-center gap-2.5 mb-3">
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
           style={{ background: avatarColor }}
         >
           {username.charAt(0).toUpperCase()}
         </div>
-        <div>
-          <p className="font-bold text-sm text-gray-800">@{username}</p>
-          <p className="text-xs text-gray-400">{timeAgo}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-stone-900">@{username}</p>
+          <p className="text-xs text-stone-400">{timeAgo}</p>
         </div>
       </div>
 
-      {/* 本文 */}
-      <p className="text-sm text-gray-700 leading-relaxed">{content}</p>
+      <p className="text-sm text-stone-700 leading-relaxed">{content}</p>
 
-      {/* タグ */}
       {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           {tags.map((tag) => (
-            <span key={tag} className="text-pink-500 text-xs font-medium hover:underline cursor-pointer">
+            <span key={tag} className="text-xs text-stone-400 hover:text-stone-600 cursor-pointer transition-colors">
               #{tag}
             </span>
           ))}
         </div>
       )}
 
-      {/* アクション */}
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-50">
-        <button className="flex items-center gap-1.5 text-gray-400 hover:text-pink-500 transition-colors text-sm group">
-          <HeartIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-stone-50">
+        <button className="flex items-center gap-1.5 text-stone-400 hover:text-rose-400 transition-colors text-xs">
+          <HeartIcon className="w-4 h-4" />
           <span>{likes}</span>
         </button>
-        <button className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors text-sm">
+        <button className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 transition-colors text-xs">
           <CommentIcon className="w-4 h-4" />
           <span>{comments}</span>
         </button>
-        <button className="flex items-center gap-1.5 text-gray-400 hover:text-green-500 transition-colors text-sm ml-auto">
+        <button className="flex items-center gap-1.5 text-stone-400 hover:text-stone-600 transition-colors text-xs ml-auto">
           <ShareIcon className="w-4 h-4" />
-          <span>シェア</span>
         </button>
         <ReportButton targetType="投稿" />
       </div>
