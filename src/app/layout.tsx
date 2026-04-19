@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AgeVerificationModal from "@/components/AgeVerificationModal";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata: Metadata = {
   title: "PetaMikke - シール好きのためのマーケット",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <AgeVerificationModal />
         {children}
         <Footer />
+        <ScrollToTop />
       </body>
     </html>
   );

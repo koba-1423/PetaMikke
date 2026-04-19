@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HomeIcon, ShopIcon, TradeIcon, BookIcon, UserIcon, LogoIcon, PlusIcon } from "@/components/Icons";
+import { HomeIcon, ShopIcon, TradeIcon, BookIcon, UserIcon, LogoIcon, PlusIcon, MapPinIcon } from "@/components/Icons";
 
 export default function Navbar() {
   return (
@@ -17,6 +17,7 @@ export default function Navbar() {
               { href: "/market", label: "マーケット", icon: <ShopIcon className="w-4 h-4" /> },
               { href: "/trade", label: "交換", icon: <TradeIcon className="w-4 h-4" /> },
               { href: "/zukan", label: "シール図鑑", icon: <BookIcon className="w-4 h-4" /> },
+            { href: "/map", label: "マップ", icon: <MapPinIcon className="w-4 h-4" /> },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -63,6 +64,7 @@ export default function Navbar() {
 
         {[
           { href: "/trade", label: "交換", icon: <TradeIcon className="w-5 h-5" /> },
+          { href: "/map", label: "マップ", icon: <MapPinIcon className="w-5 h-5" /> },
           { href: "/mypage", label: "マイページ", icon: <UserIcon className="w-5 h-5" /> },
         ].map((item) => (
           <Link key={item.href} href={item.href} className="flex flex-col items-center gap-0.5 text-stone-400 hover:text-stone-900 transition-colors">
