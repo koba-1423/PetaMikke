@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { LogoIcon } from "@/components/Icons";
 
 export default function SetupUsernamePage() {
   const router = useRouter();
-  const supabase = createClient();
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,37 +29,6 @@ export default function SetupUsernamePage() {
     }
 
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError("ログインが必要です");
-      setLoading(false);
-      return;
-    }
-
-    // ユーザー名の重複チェック
-    const { data: existing } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("username", trimmed)
-      .single();
-
-    if (existing) {
-      setError("このユーザー名はすでに使用されています");
-      setLoading(false);
-      return;
-    }
-
-    // プロフィール作成
-    const { error: insertError } = await supabase
-      .from("profiles")
-      .insert({ id: user.id, username: trimmed });
-
-    if (insertError) {
-      setError("エラーが発生しました。もう一度お試しください。");
-      setLoading(false);
-      return;
-    }
-
     router.push("/");
   };
 

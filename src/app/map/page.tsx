@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import { MapPinIcon, PlusIcon } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
 import type { StorePin } from "@/components/Map";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
@@ -99,8 +98,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
 }
 
 export default function MapPage() {
-  const supabase = createClient();
-  const [username, setUsername] = useState<string>("");
+  const [username, setUsername] = useState<string>("guest_user");
   const [pins, setPins]               = useState<StorePin[]>(initialPins);
   const [selectedPin, setSelectedPin] = useState<StorePin | null>(null);
   const [mode, setMode]               = useState<Mode>("none");
@@ -117,17 +115,7 @@ export default function MapPage() {
 
   // ログイン中のユーザー名を取得
   useEffect(() => {
-    const fetchUsername = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("id", user.id)
-        .single();
-      if (profile) setUsername(profile.username);
-    };
-    fetchUsername();
+    setUsername("guest_user");
   }, []);
 
   const openEdit = (pin: StorePin) => {
