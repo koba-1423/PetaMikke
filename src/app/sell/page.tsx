@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { CameraIcon, PlusIcon } from "@/components/Icons";
-import { LOCAL_LISTINGS_KEY, type ListingCondition, type ListingType, type UserListing } from "@/lib/listings";
+import { readStoredListings, writeStoredListings, type ListingCondition, type ListingType, type UserListing } from "@/lib/listings";
+import { readAuthSession, type LocalAuthSession } from "@/lib/local-auth";
 
 const sealSeriesOptions = [
   "ボンボンドロップシール",
@@ -22,6 +23,7 @@ const listingTypes = ["販売のみ", "交換のみ", "両方OK"];
 
 export default function SellPage() {
   const router = useRouter();
+  const [session, setSession] = useState<LocalAuthSession | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [sealName, setSealName] = useState("");
   const [series, setSeries] = useState("");
@@ -32,6 +34,10 @@ export default function SellPage() {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setSession(readAuthSession());
+  }, []);
 
   const receiveAmount = useMemo(() => {
     const amount = Number(price);
@@ -64,6 +70,11 @@ export default function SellPage() {
   const handleSubmit = () => {
     setError("");
 
+    if (!session) {
+      setError("出品するにはログインが必要です");
+      return;
+    }
+
     if (!sealName.trim()) {
       setError("シール名を入力してください");
       return;
@@ -86,6 +97,9 @@ export default function SellPage() {
 
     const listing: UserListing = {
       id: crypto.randomUUID(),
+      ownerUserId: session.userId,
+      ownerUsername: session.username,
+      ownerEmail: session.email,
       name: sealName.trim(),
       series,
       condition,
@@ -97,9 +111,8 @@ export default function SellPage() {
     };
 
     try {
-      const raw = window.localStorage.getItem(LOCAL_LISTINGS_KEY);
-      const current = raw ? (JSON.parse(raw) as UserListing[]) : [];
-      window.localStorage.setItem(LOCAL_LISTINGS_KEY, JSON.stringify([listing, ...current]));
+      const current = readStoredListings();
+      writeStoredListings([listing, ...current]);
       router.push("/mypage?listed=1");
       router.refresh();
     } catch {
@@ -114,7 +127,24 @@ export default function SellPage() {
 
       <div className="max-w-lg mx-auto px-5 py-8">
         <h1 className="text-xl font-semibold text-stone-900 mb-1">シールを出品する</h1>
-        <p className="text-stone-400 text-sm mb-6">シールの情報を入力して出品しよう</p>
+        <p className="text-stone-400 text-sm mb-3">シールの情報を入力して出品しよう</p>
+        <p className="text-xs text-stone-500 mb-6">
+          {session ? `@${session.username} として出品します` : "ログイン後に出品できます"}
+        </p>
+
+        {!session && (
+          <div className="border border-amber-100 bg-amber-50 rounded-xl p-4 mb-6">
+            <p className="text-sm font-medium text-amber-800">出品にはログインが必要です</p>
+            <p className="text-xs text-amber-700 mt-1">ログインすると、出品があなたのアカウントに紐づきます。</p>
+            <button
+              type="button"
+              onClick={() => router.push("/login")}
+              className="mt-3 inline-flex items-center rounded-full bg-stone-900 px-4 py-2 text-xs font-medium text-white hover:bg-stone-700 transition-colors"
+            >
+              ログインへ
+            </button>
+          </div>
+        )}
 
         {/* 偽物禁止警告 */}
         <div className="border border-red-100 bg-red-50 rounded-xl p-4 mb-6">
@@ -279,8 +309,8 @@ export default function SellPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={saving}
-            className="w-full bg-stone-900 text-white font-medium py-3.5 rounded-full hover:bg-stone-700 transition-colors text-sm disabled:opacity-50"
+            disabled={!session || saving}
+            className="w-full bg-stone-900 text-white font-medium py-3.5 rounded-full hover:bg-stone-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? "保存中..." : "出品する"}
           </button>

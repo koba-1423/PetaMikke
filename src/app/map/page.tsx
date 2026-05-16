@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import { MapPinIcon, PlusIcon } from "@/components/Icons";
 import type { StorePin } from "@/components/Map";
+import { readAuthSession, type LocalAuthSession } from "@/lib/local-auth";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -98,7 +100,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
 }
 
 export default function MapPage() {
-  const [username, setUsername] = useState<string>("guest_user");
+  const [session, setSession] = useState<LocalAuthSession | null>(null);
   const [pins, setPins]               = useState<StorePin[]>(initialPins);
   const [selectedPin, setSelectedPin] = useState<StorePin | null>(null);
   const [mode, setMode]               = useState<Mode>("none");
@@ -115,7 +117,7 @@ export default function MapPage() {
 
   // ログイン中のユーザー名を取得
   useEffect(() => {
-    setUsername("guest_user");
+    setSession(readAuthSession());
   }, []);
 
   const openEdit = (pin: StorePin) => {
@@ -178,7 +180,7 @@ export default function MapPage() {
   };
 
   const handlePost = () => {
-    if (!post.storeName.trim() || !post.sealName.trim() || !geocodedCoords) return;
+    if (!session || !post.storeName.trim() || !post.sealName.trim() || !geocodedCoords) return;
     const newPin: StorePin = {
       id: Date.now(),
       name: post.storeName,
@@ -193,8 +195,8 @@ export default function MapPage() {
       perPersonLimit: post.perPersonLimit ? parseInt(post.perPersonLimit) : undefined,
       perTypeLimit: post.perTypeLimit ? parseInt(post.perTypeLimit) : undefined,
       comment: post.comment || undefined,
-      postedBy: username,
-      updatedBy: username,
+      postedBy: session.username,
+      updatedBy: session.username,
       updatedAt: "たった今",
     };
     setPins((prev) => [newPin, ...prev]);
@@ -209,7 +211,7 @@ export default function MapPage() {
   };
 
   const handleEdit = () => {
-    if (!selectedPin) return;
+    if (!session || !selectedPin) return;
     setPins((prev) =>
       prev.map((p) =>
         p.id === selectedPin.id ? {
@@ -222,7 +224,7 @@ export default function MapPage() {
           perPersonLimit: edit.perPersonLimit ? parseInt(edit.perPersonLimit) : undefined,
           perTypeLimit: edit.perTypeLimit ? parseInt(edit.perTypeLimit) : undefined,
           comment: edit.comment || undefined,
-          updatedBy: username,
+          updatedBy: session.username,
           updatedAt: "たった今",
         } : p
       )
@@ -231,7 +233,7 @@ export default function MapPage() {
     setMode("none");
   };
 
-  const canPost = post.storeName.trim() && post.sealName.trim() && geocodedCoords;
+  const canPost = !!session && !!post.storeName.trim() && !!post.sealName.trim() && !!geocodedCoords;
 
   return (
     <div className="pb-16 md:pb-0 flex flex-col h-screen">
@@ -245,15 +247,32 @@ export default function MapPage() {
               <MapPinIcon className="w-4 h-4 text-stone-400" />
               <h1 className="text-base font-semibold text-stone-900">シール販売マップ</h1>
             </div>
-            <p className="text-xs text-stone-400 mt-0.5">ユーザーが投稿したリアルタイムの入荷情報</p>
+            <p className="text-xs text-stone-400 mt-0.5">
+              {session ? `@${session.username} として投稿できます` : "ログインすると入荷情報を投稿できます"}
+            </p>
           </div>
           <button
-            onClick={() => { setMode(mode === "post" ? "none" : "post"); setSelectedPin(null); }}
-            className="flex items-center gap-1.5 bg-stone-900 text-white text-xs font-medium px-3.5 py-2 rounded-full hover:bg-stone-700 transition-colors"
+            onClick={() => {
+              if (!session) return;
+              setMode(mode === "post" ? "none" : "post");
+              setSelectedPin(null);
+            }}
+            className={`flex items-center gap-1.5 text-white text-xs font-medium px-3.5 py-2 rounded-full transition-colors ${
+              session ? "bg-stone-900 hover:bg-stone-700" : "bg-stone-300 cursor-not-allowed"
+            }`}
           >
             <PlusIcon className="w-3.5 h-3.5" />投稿する
           </button>
         </div>
+
+        {!session && (
+          <div className="px-5 py-3 border-b border-amber-100 bg-amber-50 flex-shrink-0">
+            <p className="text-sm font-medium text-amber-800">投稿や修正にはログインが必要です</p>
+            <Link href="/login" className="mt-1 inline-flex text-xs text-amber-700 underline underline-offset-2">
+              ログイン画面へ
+            </Link>
+          </div>
+        )}
 
         {/* 凡例 */}
         <div className="flex items-center gap-4 px-5 py-2.5 border-b border-stone-50 bg-white flex-shrink-0">
@@ -341,7 +360,7 @@ export default function MapPage() {
           <div className="flex-shrink-0 border-t border-stone-100 bg-white p-5 space-y-3 max-h-[65vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-stone-900 text-sm">入荷情報を投稿する</h2>
-              {username && <span className="text-xs text-stone-400">@{username} として投稿</span>}
+              {session && <span className="text-xs text-stone-400">@{session.username} として投稿</span>}
             </div>
 
             {/* 店名：自由入力 */}
@@ -455,7 +474,7 @@ export default function MapPage() {
               <h2 className="font-semibold text-stone-900 text-sm">「{selectedPin.name}」の情報を修正する</h2>
               <button onClick={() => setMode("none")} className="text-stone-300 hover:text-stone-600 text-xl leading-none">×</button>
             </div>
-            {username && <p className="text-xs text-stone-400">@{username} として修正</p>}
+            {session && <p className="text-xs text-stone-400">@{session.username} として修正</p>}
 
             <Field label="シールの名前">
               <Input value={edit.sealName} onChange={(v) => setEdit({ ...edit, sealName: v })} placeholder={selectedPin.sealName} />

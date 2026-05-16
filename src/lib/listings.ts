@@ -5,6 +5,9 @@ export type ListingCondition = "未使用" | "良好" | "傷あり";
 
 export type UserListing = {
   id: string;
+  ownerUserId: string;
+  ownerUsername: string;
+  ownerEmail: string;
   name: string;
   series: string;
   condition: ListingCondition;

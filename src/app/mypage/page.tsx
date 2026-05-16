@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { StarIcon, PlusIcon, ChevronRightIcon } from "@/components/Icons";
 import { SealPlaceholder } from "@/components/Icons";
 import { readStoredListings, type UserListing } from "@/lib/listings";
+import { clearAuthSession, readAuthSession } from "@/lib/local-auth";
 
 const mySeals = [
   { name: "キティ ボンドロ大", series: "ボンボンドロップシール", rate: 8, status: "所持", quantity: 2 },
@@ -35,16 +37,38 @@ const menuItems = [
 ];
 
 export default function MyPage() {
+  const router = useRouter();
   const [storedListings, setStoredListings] = useState<UserListing[]>([]);
   const [showListedMessage, setShowListedMessage] = useState(false);
+  const [username, setUsername] = useState("sealqueen");
+  const [email, setEmail] = useState("");
+  const [hasSession, setHasSession] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
-    setStoredListings(readStoredListings());
     const params = new URLSearchParams(window.location.search);
     setShowListedMessage(params.get("listed") === "1");
+    const session = readAuthSession();
+    if (session) {
+      setHasSession(true);
+      setUsername(session.username);
+      setEmail(session.email);
+      setStoredListings(readStoredListings().filter((listing) => listing.ownerUserId === session.userId));
+      return;
+    }
+    setHasSession(false);
+    setStoredListings([]);
   }, []);
 
-  const allListings = [...storedListings, ...myListings];
+  const allListings = hasSession ? storedListings : myListings;
+
+  const handleMenuClick = (item: string) => {
+    if (item !== "ログアウト") return;
+    setLoggingOut(true);
+    clearAuthSession();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <div className="pb-16 md:pb-0">
@@ -65,11 +89,13 @@ export default function MyPage() {
               className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
               style={{ background: "#bc8880" }}
             >
-              S
+              {username.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-stone-900">sealqueen</h1>
-              <p className="text-stone-400 text-xs mt-0.5">シール収集歴3年 | 東京都</p>
+              <h1 className="text-lg font-semibold text-stone-900">{username}</h1>
+              <p className="text-stone-400 text-xs mt-0.5">
+                {email ? `${email} でログイン中` : "シール収集歴3年 | 東京都"}
+              </p>
               <div className="flex items-center gap-0.5 mt-1.5">
                 {[...Array(5)].map((_, i) => (
                   <StarIcon key={i} className="w-3.5 h-3.5 text-yellow-400" filled />
@@ -158,9 +184,11 @@ export default function MyPage() {
             {menuItems.map((item) => (
               <button
                 key={item}
+                type="button"
+                onClick={() => handleMenuClick(item)}
                 className="w-full flex items-center justify-between px-4 py-3.5 text-sm text-stone-700 hover:bg-stone-50 transition-colors text-left"
               >
-                {item}
+                {item === "ログアウト" && loggingOut ? "ログアウト中..." : item}
                 <ChevronRightIcon className="w-4 h-4 text-stone-300" />
               </button>
             ))}
