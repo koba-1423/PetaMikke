@@ -1,7 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { StarIcon, PlusIcon, ChevronRightIcon } from "@/components/Icons";
 import { SealPlaceholder } from "@/components/Icons";
+import { readStoredListings, type UserListing } from "@/lib/listings";
 
 const mySeals = [
   { name: "キティ ボンドロ大", series: "ボンボンドロップシール", rate: 8, status: "所持", quantity: 2 },
@@ -31,11 +35,28 @@ const menuItems = [
 ];
 
 export default function MyPage() {
+  const [storedListings, setStoredListings] = useState<UserListing[]>([]);
+  const [showListedMessage, setShowListedMessage] = useState(false);
+
+  useEffect(() => {
+    setStoredListings(readStoredListings());
+    const params = new URLSearchParams(window.location.search);
+    setShowListedMessage(params.get("listed") === "1");
+  }, []);
+
+  const allListings = [...storedListings, ...myListings];
+
   return (
     <div className="pb-16 md:pb-0">
       <Navbar />
 
       <div className="max-w-2xl mx-auto px-5 py-8">
+        {showListedMessage && (
+          <div className="mb-4 rounded-xl border border-green-100 bg-green-50 px-4 py-3">
+            <p className="text-sm font-medium text-green-700">出品を保存しました</p>
+            <p className="text-xs text-green-600 mt-1">マイページの「出品中」に追加されています。</p>
+          </div>
+        )}
 
         {/* プロフィール */}
         <div className="border border-stone-100 rounded-xl p-5 mb-6">
@@ -111,8 +132,8 @@ export default function MyPage() {
             </Link>
           </div>
           <div className="space-y-2">
-            {myListings.map((listing, i) => (
-              <div key={i} className="bg-white border border-stone-100 rounded-lg p-3 flex items-center gap-3 hover:border-stone-200 transition-colors">
+            {allListings.map((listing, i) => (
+              <div key={`${listing.name}-${i}`} className="bg-white border border-stone-100 rounded-lg p-3 flex items-center gap-3 hover:border-stone-200 transition-colors">
                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                   <SealPlaceholder series={listing.series} className="w-full h-full" />
                 </div>
